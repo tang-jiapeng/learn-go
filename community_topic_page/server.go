@@ -1,7 +1,7 @@
 package main
 
 import (
-	"community_topic_page/cotroller"
+	"community_topic_page/controller"
 	"community_topic_page/repository"
 	"gopkg.in/gin-gonic/gin.v1"
 	"os"
@@ -17,7 +17,13 @@ func main() {
 	// 构建路由
 	r.GET("/community/page/get/:id", func(c *gin.Context) {
 		topicId := c.Param("id")
-		data := cotroller.QueryPageInfo(topicId)
+		data := controller.QueryPageInfo(topicId)
+		c.JSON(200, data)
+	})
+	r.POST("/community/post/do", func(c *gin.Context) {
+		topicId, _ := c.GetPostForm("topic_id")
+		content, _ := c.GetPostForm("content")
+		data := controller.PublishPost(topicId, content)
 		c.JSON(200, data)
 	})
 	// 启动服务

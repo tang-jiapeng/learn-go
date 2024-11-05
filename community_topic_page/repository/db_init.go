@@ -4,11 +4,13 @@ import (
 	"bufio"
 	"encoding/json"
 	"os"
+	"sync"
 )
 
 var (
 	topicIndexMap map[int64]*Topic
 	postIndexMap  map[int64][]*Post
+	rwMutex       sync.RWMutex
 )
 
 func Init(filePath string) error {

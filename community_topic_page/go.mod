@@ -3,10 +3,9 @@ module community_topic_page
 go 1.16
 
 require (
-	bou.ke/monkey v1.0.2
-	github.com/bytedance/gopkg v0.0.0-20220401081311-c38fb59326b7
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.3.0 // indirect
+	github.com/gitstliu/go-id-worker v0.0.0-20190725025543-5a5fe074e612
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kr/pretty v0.3.0 // indirect
