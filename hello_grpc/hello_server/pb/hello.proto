@@ -1,0 +1,30 @@
+syntax = "proto3"; 
+
+option go_package = "hello_server/pb"; // 项目中import导入生成的go代码的模块
+
+package pb; // proto文件模块
+
+// 定义服务
+service Greeter {
+  // 定义方法
+  rpc SayHello (HelloRequest) returns (HelloResponse) {}
+  rpc Add (AddParam) returns (Result) {}
+}
+
+// 定义的消息
+message HelloRequest {
+  string name = 1; // 字段序号
+}
+
+message HelloResponse {
+  string reply = 1;
+}
+
+message AddParam {
+  int32 x = 1;
+  int32 y = 2;
+}
+
+message Result {
+  int64 z = 1;
+}
