@@ -219,11 +219,14 @@ const file_pb_hello_proto_rawDesc = "" +
 	"\x01x\x18\x01 \x01(\x05R\x01x\x12\f\n" +
 	"\x01y\x18\x02 \x01(\x05R\x01y\"\x16\n" +
 	"\x06Result\x12\f\n" +
-	"\x01z\x18\x01 \x01(\x03R\x01z2_\n" +
+	"\x01z\x18\x01 \x01(\x03R\x01z2\x8d\x02\n" +
 	"\aGreeter\x121\n" +
 	"\bSayHello\x12\x10.pb.HelloRequest\x1a\x11.pb.HelloResponse\"\x00\x12!\n" +
 	"\x03Add\x12\f.pb.AddParam\x1a\n" +
-	".pb.Result\"\x00B\x11Z\x0fhello_client/pbb\x06proto3"
+	".pb.Result\"\x00\x128\n" +
+	"\rLotsOfReqlies\x12\x10.pb.HelloRequest\x1a\x11.pb.HelloResponse\"\x000\x01\x12:\n" +
+	"\x0fLotsOfGreetings\x12\x10.pb.HelloRequest\x1a\x11.pb.HelloResponse\"\x00(\x01\x126\n" +
+	"\tBidiHello\x12\x10.pb.HelloRequest\x1a\x11.pb.HelloResponse\"\x00(\x010\x01B\x11Z\x0fhello_client/pbb\x06proto3"
 
 var (
 	file_pb_hello_proto_rawDescOnce sync.Once
@@ -247,10 +250,16 @@ var file_pb_hello_proto_goTypes = []any{
 var file_pb_hello_proto_depIdxs = []int32{
 	0, // 0: pb.Greeter.SayHello:input_type -> pb.HelloRequest
 	2, // 1: pb.Greeter.Add:input_type -> pb.AddParam
-	1, // 2: pb.Greeter.SayHello:output_type -> pb.HelloResponse
-	3, // 3: pb.Greeter.Add:output_type -> pb.Result
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
+	0, // 2: pb.Greeter.LotsOfReqlies:input_type -> pb.HelloRequest
+	0, // 3: pb.Greeter.LotsOfGreetings:input_type -> pb.HelloRequest
+	0, // 4: pb.Greeter.BidiHello:input_type -> pb.HelloRequest
+	1, // 5: pb.Greeter.SayHello:output_type -> pb.HelloResponse
+	3, // 6: pb.Greeter.Add:output_type -> pb.Result
+	1, // 7: pb.Greeter.LotsOfReqlies:output_type -> pb.HelloResponse
+	1, // 8: pb.Greeter.LotsOfGreetings:output_type -> pb.HelloResponse
+	1, // 9: pb.Greeter.BidiHello:output_type -> pb.HelloResponse
+	5, // [5:10] is the sub-list for method output_type
+	0, // [0:5] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name

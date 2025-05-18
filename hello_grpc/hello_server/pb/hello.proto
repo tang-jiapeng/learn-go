@@ -9,6 +9,15 @@ service Greeter {
   // 定义方法
   rpc SayHello (HelloRequest) returns (HelloResponse) {}
   rpc Add (AddParam) returns (Result) {}
+
+  //服务端返回流式数据
+  rpc LotsOfReqlies(HelloRequest) returns (stream HelloResponse) {}
+  
+  // 客户端发送流式数据
+  rpc LotsOfGreetings(stream HelloRequest) returns (HelloResponse) {}
+
+  // 双向流式数据
+  rpc BidiHello(stream HelloRequest) returns (stream HelloResponse) {}
 }
 
 // 定义的消息
