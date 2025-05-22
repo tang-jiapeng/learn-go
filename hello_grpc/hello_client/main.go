@@ -14,7 +14,7 @@ import (
 
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
@@ -31,7 +31,14 @@ func main() {
 	flag.Parse() // 解析命令行参数
 
 	// 连接server
-	conn, err := grpc.Dial("127.0.0.1:8972", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	// 加载证书
+	creds, err := credentials.NewClientTLSFromFile("certs/server.crt", "tang-jiapeng.github.io")
+	if err != nil {
+		log.Fatalf("credentials.NewClientTLSFromFile failed, err:%v", err)
+		return
+	}
+	// conn, err := grpc.Dial("127.0.0.1:8972", grpc.WithTransportCredentials(insecure.NewCredentials())) // 不安全的连接
+	conn, err := grpc.Dial("127.0.0.1:8972", grpc.WithTransportCredentials(creds))
 	if err != nil {
 		log.Fatalf("grpc.Dial failed,err:%v", err)
 		return

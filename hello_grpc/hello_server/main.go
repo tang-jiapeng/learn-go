@@ -14,6 +14,7 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
@@ -174,7 +175,15 @@ func main() {
 	if err != nil {
 		fmt.Printf("fail to listen, err: %v\n", err)
 	}
-	s := grpc.NewServer() // 创建grpc服务
+
+	// 加载证书信息
+	creds , err := credentials.NewServerTLSFromFile("certs/server.crt", "certs/server.key")
+	if err != nil {
+		fmt.Printf("fail to load cert, err: %v\n", err)
+		return
+	}
+
+	s := grpc.NewServer(grpc.Creds(creds)) // 创建grpc服务
 	// 注册服务
 	pb.RegisterGreeterServer(s, &server{count: make(map[string]int)})
 	// 启动服务
