@@ -8,8 +8,10 @@ import (
 	"net"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -19,6 +21,8 @@ import (
 // grpc server
 type server struct {
 	pb.UnimplementedGreeterServer
+	mu    sync.Mutex     // count的并发锁
+	count map[string]int // 存储每个name调用sayHello的次数
 }
 
 // SayHello 是我们需要实现的方法
@@ -27,11 +31,11 @@ func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloRe
 	// 利用defer 在发送完响应数据后发送trailer
 	defer func() {
 		trailer := metadata.Pairs(
-			"timestamp" , strconv.Itoa(int(time.Now().Unix())),
+			"timestamp", strconv.Itoa(int(time.Now().Unix())),
 		)
-		grpc.SetTrailer(ctx , trailer)
+		grpc.SetTrailer(ctx, trailer)
 	}()
-	
+
 	// 在执行业务逻辑之前要check metadata中是否包含token
 	md, ok := metadata.FromIncomingContext(ctx)
 	fmt.Printf("md:%#v ok:%#v\n", md, ok)
@@ -51,14 +55,36 @@ func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloRe
 	// 	}
 	// }
 
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.count[in.GetName()]++
+	if s.count[in.GetName()] > 1 {
+		// 返回请求次数限制的错误
+		st := status.New(codes.ResourceExhausted, "请求次数限制")
+		// 添加错误详情信息 需要接收返回的status
+		ds, err := st.WithDetails(
+			&errdetails.QuotaFailure{
+				Violations: []*errdetails.QuotaFailure_Violation{
+					{
+						Subject:     fmt.Sprintf("name:%s", in.Name),
+						Description: "每个name只能调用一次",
+					},
+				},
+			},
+		)
+		if err != nil { // withDetails执行失败,返回原来的status.Err
+			return nil, st.Err()
+		}
+		return nil, ds.Err()
+	}
+
 	reply := "hello " + in.GetName()
-	
+
 	// 发送数据前发送header
 	header := metadata.New(map[string]string{
 		"location": "Xian",
 	})
 	grpc.SendHeader(ctx, header)
-
 
 	return &pb.HelloResponse{
 		Reply: reply,
@@ -150,7 +176,7 @@ func main() {
 	}
 	s := grpc.NewServer() // 创建grpc服务
 	// 注册服务
-	pb.RegisterGreeterServer(s, &server{})
+	pb.RegisterGreeterServer(s, &server{count: make(map[string]int)})
 	// 启动服务
 	if err = s.Serve(l); err != nil {
 		fmt.Printf("failed to serve , err: %v\n", err)

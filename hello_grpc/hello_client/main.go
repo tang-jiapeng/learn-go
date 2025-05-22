@@ -12,9 +12,11 @@ import (
 	"strings"
 	"time"
 
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 )
 
 // grpc 客户端
@@ -55,6 +57,15 @@ func main() {
 		grpc.Trailer(&trailer),
 	)
 	if err != nil {
+		s := status.Convert(err)
+		for _, d := range s.Details() {
+			switch info := d.(type) {
+			case *errdetails.QuotaFailure:
+				fmt.Printf("QuotaFailure:%s\n", info.String())
+			default:
+				fmt.Printf("unexpected type:%v\n", info)
+			}
+		}
 		log.Printf("c.SayHellofailed, err:%v", err)
 		return
 	}
