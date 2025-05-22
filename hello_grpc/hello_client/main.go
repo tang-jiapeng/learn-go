@@ -14,6 +14,7 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 )
 
 // grpc 客户端
@@ -37,28 +38,52 @@ func main() {
 	// 创建客户端
 	c := pb.NewGreeterClient(conn) // 使用生成的Go代码
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
 	// 调用RPC方法，普通rpc调用
-	// ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	// defer cancel()
-	// respHello, err1 := c.SayHello(ctx, &pb.HelloRequest{Name: *name})
-	// respAdd, err2 := c.Add(ctx, &pb.AddParam{
+	// 带元数据
+	md := metadata.Pairs(
+		"token", "app-test-tang",
+	)
+	ctx = metadata.NewOutgoingContext(ctx, md)
+	var header, trailer metadata.MD
+	respHello, err := c.SayHello(
+		ctx,
+		&pb.HelloRequest{Name: *name},
+		grpc.Header(&header),
+		grpc.Trailer(&trailer),
+	)
+	if err != nil {
+		log.Printf("c.SayHellofailed, err:%v", err)
+		return
+	}
+
+	// 拿到响应数据之前,获取header
+	fmt.Printf("header:%v\n", header)
+
+	// 拿到了RPC响应
+	log.Printf("resp:%v", respHello.GetReply())
+	// log.Printf("resp:%v", respAdd.GetZ())
+
+	// 拿到响应数据之后获取trailer
+	fmt.Printf("trailer:%#v\n", trailer)
+
+	// respAdd, err := c.Add(ctx, &pb.AddParam{
 	//   X: int32(*paramX),
 	//   Y: int32(*paramY),
 	// })
-	// if err1 != nil || err2 != nil {
-	// 	log.Printf("c.SayHello or c.Add failed, err:%v", err)
+	// if err != nil {
+	// 	log.Printf("c.Add failed, err:%v", err)
 	// 	return
 	// }
-	// // 拿到了RPC响应
-	// log.Printf("resp:%v", respHello.GetReply())
-	// log.Printf("resp:%v", respAdd.GetZ())
 
 	// 调用服务端流式rpc
 	// callLotsOfReplies(c)
 
 	// callLotsOfGreetings(c)
 
-	runBidiHello(c)
+	// runBidiHello(c)
 }
 
 func callLotsOfReplies(c pb.GreeterClient) {
